@@ -1,0 +1,114 @@
+buildscript {
+    
+    repositories {
+        mavenCentral()
+        maven { url 'http://dl.bintray.com/asciidoctor/maven/' }
+        maven { url 'http://repo.springsource.org/plugins-release' }
+    }
+
+    dependencies {
+        classpath 'org.asciidoctor:asciidoctorj:1.5.1',
+                  'org.asciidoctor:asciidoctor-gradle-plugin:1.5.0',
+                  'io.spring.gradle:docbook-reference-plugin:0.3.0'
+    }
+}
+
+apply plugin: 'idea'
+apply plugin: 'jetty'
+apply plugin: 'docbook-reference'
+apply plugin: 'org.asciidoctor.gradle.asciidoctor'
+
+import org.asciidoctor.gradle.*
+
+asciidoctorj {
+    //version = '1.5.1'
+}
+
+public void beforeExecute(Task task) {
+    println "[$task.name]"
+    System.setProperty('jruby.logger.class','org.jruby.util.log.StandardErrorLogger')
+}
+
+public void afterExecute(Task task, TaskState state) {
+    println()
+}
+
+// common settings
+tasks.withType(AsciidoctorTask) { docTask ->
+    classpath = project.configurations.asciidoctor
+    options = [
+            logDocuments: false,
+            attributes: [
+                    imagesdir: './images',
+                    icons: 'font',
+                    experimental: true
+           ]
+    ]
+}
+
+clean << {
+    file('webroot').deleteDir()
+    file("$buildDir/reference").deleteDir()
+}
+
+task generateHTML (type: AsciidoctorTask, description: 'Generates single and multiple HTML documentation.') {
+    sourceDir = file('src/asciidoc/simpledoc')
+    outputDir = file('webroot/html')
+    options.attributes.copycss = true
+}
+
+def ascidocDir = file('src/asciidoc/docs')
+def docbookDir = file('webroot/docbook')
+
+task generateDocbook (type: AsciidoctorTask, description: 'Generates DOCBOOK documentation.') {
+    backends  = ['docbook']
+    sourceDir = ascidocDir
+    outputDir = docbookDir
+    options   = [
+                    doctype   : 'book',
+                    attributes: [
+                        'source-highlighter': 'coderay',
+                        toc                 : '',
+                        idprefix            : '',
+                        idseparator         : '-'
+                ]
+    ]
+}
+
+reference {
+    sourceDir = docbookDir
+
+}        
+reference.dependsOn(generateDocbook)
+
+task generatePdf(type:Copy) {    
+    from "$buildDir/reference"
+    into 'webroot'   
+}
+generatePdf.dependsOn(reference)
+
+task generatePresentation(type: AsciidoctorTask) {
+    sourceDocumentNames = files('src/asciidoc/presentation/presentation.adoc')
+    requires = ['slim', 'thread_safe']
+    options = [
+        template_engine: 'slim',
+        template_dirs: ['./templates']
+    ]
+}
+
+// agregation task for all generators
+task generateAll << {
+    println("Generating documentation")
+}
+generateAll.dependsOn(generateHTML, generatePdf, generatePresentation)
+
+//local web server 
+task server(type: JettyRun) {
+
+    contextPath = '/'
+    webAppSourceDirectory = file('webroot')
+    httpPort = 8888
+}
+server.dependsOn(generateAll)
+
+defaultTasks 'generateAll'

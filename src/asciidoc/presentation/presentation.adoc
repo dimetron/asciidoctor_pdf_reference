@@ -1,0 +1,63 @@
+:backend: revealjs
+:revealjs_theme: night
+:revealjs_control: true
+:revealjs_center: true
+:revealjs_transition: linear
+:source-highlighter: coderay
+
+:images: ./images
+
+== Writing Documentation with Asciidoctor is Awesome
+
+image:{images}/lego-everything-is-awesome.png[]
+
+
+== Writing Documentation
+
+[%step]
+* Developers do not like writing documentation
+* Different tools
+* Different formats
+
+== Is there a better way to write documentation?
+
+image:{images}/lego-instructions.jpg[]
+
+== Asciidoctor Sample
+
+image:{images}/sample-adoc.png[]
+
+== Asciidoctor Sample Output
+
+image:{images}/sample-adoc-output.png[]
+
+== What is Asciidoctor
+
+* Better Asciidoc
+* Written in Ruby
+* Built-in templates for HTML5 and Docbook
+* Support attributes
+* Include external files
+* Extensions
+
+== Asciidoctor tools
+
+* Command line
+* AsciidoctorJ(ava)
+* Gradle
+* Maven
+* Asciidoctor.js
+* Browser plugins
+
+== Who is using Asciidoctor?
+
+* Spring
+* Groovy, Golo and Ceylon languages
+* Arquillian, Weld and other JBoss sites
+* O'reilly
+* GitHub 
+
+== Show the code (or documentation)
+
+image:{images}/lego-suprise.jpg[]
+
