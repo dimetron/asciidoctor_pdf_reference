@@ -88,7 +88,8 @@ task generatePdf(type:Copy) {
 generatePdf.dependsOn(reference)
 
 task generatePresentation(type: AsciidoctorTask) {
-    sourceDocumentNames = files('src/asciidoc/presentation/presentation.adoc')
+    sourceDir = file('src/asciidoc/presentation')
+    outputDir = file('webroot/presentation')
     requires = ['slim', 'thread_safe']
     options = [
         template_engine: 'slim',
